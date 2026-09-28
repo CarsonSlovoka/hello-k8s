@@ -1,8 +1,8 @@
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 .ONESHELL:
-.PHONY: all help version check_dep run start create stop config \
-	context
+.PHONY: all help version check_dep run start create stop \
+	config config.context
 
 REQUIRED_PACKAGES = kubectl kind container
 CLUSTER_NAME = hello-cluster
@@ -68,6 +68,7 @@ help:
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "create" "建立 $(CLUSTER_NAME)"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "stop"   "刪除叢集並停止 system"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "config" "顯示 ~/.kube/config"
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "config.context" "從 ~/.kube/config 得到相關的context"
 
 check_dep.stamp:
 	@$(call header,檢查相依套件)
@@ -126,7 +127,7 @@ config:
 
 
 # Tip: 其實這些context的內容，都可以在 ~/.kube/config 中看到
-context:
+config.context:
 	@$(call header,context)
 
 	@# 列出本機所有已知叢集。* 那一列是目前目標
