@@ -9,6 +9,7 @@ SHELL := /bin/bash
 REQUIRED_PACKAGES = kubectl kind container \
 	mdbook
 CLUSTER_NAME = hello-cluster
+DOC_SOURCES := book.toml $(shell find docs -name '*.md' 2>/dev/null)
 
 
 # ---------------------------------------------------------------------------
@@ -45,7 +46,7 @@ define header
 	printf '$(C_BOLD)$(C_HEADER)━━ %s$(C_RESET)\n' "$(1)"
 endef
 
-define info
+define tip
 	printf '$(C_CYAN)ℹ  %s$(C_RESET)\n' "$(1)"
 endef
 
@@ -75,14 +76,20 @@ help:
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.cluster"   "cluster-info 確認打到這座叢集的 API Server"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.get"       "kubectl get <name>: Display one or many resources."
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.describe"  "Show details of a specific resource or group of resources."
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "mdbook.serve"      "建置並預覽 docs/"
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "mdbook.init"       "已停用（避免覆蓋現有 docs）"
 
+# 現在 book.toml 與 docs/ 已有內容，再跑會覆蓋筆記
 mdbook.init:
-	@$(call header,生成book.toml)
-	@$(call run,   mdbook init hello-k8s)
-	@$(call run,   mv -v  hello-k8s/* .)
-	@$(call run,   rm -rf hello-k8s)
+	@$(call header,mdbook.init 已停用)
+	@$(call warn,  book.toml 與 docs/ 已存在，這個 target 不會改任何檔案)
+	@$(call tip,   預覽筆記請用: make mdbook.serve)
+	@# 舊流程（不要解除註解）：
+	@# mdbook init hello-k8s
+	@# mv -v hello-k8s/* .
+	@# rm -rf hello-k8s
 
-mdbook.build.stamp: book.toml $(fd . -e md docs)
+mdbook.build.stamp: $(DOC_SOURCES)
 	@$(call run,   mdbook build)
 	touch mdbook.build.stamp
 
