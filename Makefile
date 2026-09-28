@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 .ONESHELL:
-.PHONY: all help info check_dep run start create stop config \
+.PHONY: all help version check_dep run start create stop config \
 	context
 
 REQUIRED_PACKAGES = kubectl kind container
@@ -62,7 +62,7 @@ endef
 
 help:
 	@$(call header,Targets)
-	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "info"   "查看 container 版本"
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "version"   "查看 container 版本"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "run"    "start + create 後列出叢集"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "start"  "啟動 container system"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "create" "建立 $(CLUSTER_NAME)"
@@ -85,7 +85,7 @@ check_dep.stamp:
 
 check_dep: check_dep.stamp
 
-info: check_dep.stamp
+version: check_dep.stamp
 	@$(call header,container 版本資訊)
 	@$(call run,container --version)
 	container --version > k8s.txt
