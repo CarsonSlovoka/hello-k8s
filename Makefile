@@ -170,3 +170,20 @@ kubectl.get:
 	@$(call run,   kubectl get nodes -o wide)
 
 
+	@$(call header,kubectl get pods 相關)
+	@$(call run,   kubectl get pods -A)
+	@# -A / --all-namespaces：看所有 namespace，不只預設的 default
+	@# NAMESPACE     NAME                                    READY   STATUS    RESTARTS   AGE
+	@# kube-system   coredns-7d764666f9-8chw5                1/1     Running   0          87m
+	@# kube-system   coredns-7d764666f9-wzlz9                1/1     Running   0          87m
+	@# kube-system   etcd-hello-cluster                      1/1     Running   0          88m
+	@# kube-system   kindnet-bsnzq                           1/1     Running   0          87m
+	@# kube-system   kube-apiserver-hello-cluster            1/1     Running   0          88m
+	@# kube-system   kube-controller-manager-hello-cluster   1/1     Running   0          88m
+	@# kube-system   kube-proxy-w5kdl                        1/1     Running   0          87m
+	@# kube-system   kube-scheduler-hello-cluster            1/1     Running   0          88m
+
+	@# coredns（叢集內 DNS）
+	@# kindnet 或類似 CNI
+	@# 控制平面: kube-apiserver、kube-controller-manager、kube-scheduler、etcd
+	@# kube-proxy
