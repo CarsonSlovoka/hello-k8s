@@ -63,15 +63,15 @@ endef
 
 help:
 	@$(call header,Targets)
-	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "version"   "查看 container 版本"
-	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "run"    "start + create 後列出叢集"
-	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "start"  "啟動 container system"
-	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "create" "建立 $(CLUSTER_NAME)"
-	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "stop"   "刪除叢集並停止 system"
-	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "config" "顯示 ~/.kube/config"
-	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "config.context" "從 ~/.kube/config 得到相關的context"
-	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.cluster" "cluster-info 確認打到這座叢集的 API Server"
-	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.get"     "kubectl get <name>: Display one or many resources."
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "version"           "查看 container 版本"
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "run"               "start + create 後列出叢集"
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "start"             "啟動 container system"
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "create"            "建立 $(CLUSTER_NAME)"
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "stop"              "刪除叢集並停止 system"
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "config"            "顯示 ~/.kube/config"
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "config.context"    "從 ~/.kube/config 得到相關的context"
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.cluster"   "cluster-info 確認打到這座叢集的 API Server"
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.get"       "kubectl get <name>: Display one or many resources."
 
 check_dep.stamp:
 	@$(call header,檢查相依套件)
