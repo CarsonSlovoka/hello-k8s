@@ -76,6 +76,7 @@ help:
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.cluster"   "cluster-info 確認打到這座叢集的 API Server"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.get"       "kubectl get <name>: Display one or many resources."
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.describe"  "Show details of a specific resource or group of resources."
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "check_dep"         "檢查 kubectl/kind/container/mdbook 是否在 PATH"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "mdbook.serve"      "建置並預覽 docs/"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "mdbook.init"       "已停用（避免覆蓋現有 docs）"
 
@@ -96,19 +97,41 @@ mdbook.build.stamp: $(DOC_SOURCES)
 mdbook.serve: book.toml mdbook.build.stamp
 	@$(call run,   mdbook serve)
 
+# 只檢查、不安裝。brew list 看的是 formula 名稱（例如 kubernetes-cli），
+# 與指令名稱 kubectl 不一定相同；自動 brew install 也可能裝到非預期套件
+# check_dep.stamp:
+# 	@$(call header,檢查相依套件)
+# 	for pkg in $(REQUIRED_PACKAGES); do \
+# 		printf '$(C_CYAN)檢查:$(C_RESET) %s\n' "$$pkg"; \
+# 		if ! brew list "$$pkg" >/dev/null 2>&1; then \
+# 			printf '$(C_YELLOW)⚠  未安裝 %s，正在自動安裝...$(C_RESET)\n' "$$pkg"; \
+# 			brew install "$$pkg" || exit 1; \
+# 			printf '$(C_GREEN)✔  已安裝 %s$(C_RESET)\n' "$$pkg"; \
+# 		else \
+# 			printf '$(C_GREEN)✔  %s 已安裝$(C_RESET)\n' "$$pkg"; \
+# 		fi; \
+# 	done
+# 	touch check_dep.stamp
 check_dep.stamp:
-	@$(call header,檢查相依套件)
-	for pkg in $(REQUIRED_PACKAGES); do \
-		printf '$(C_CYAN)檢查:$(C_RESET) %s\n' "$$pkg"; \
-		if ! brew list "$$pkg" >/dev/null 2>&1; then \
-			printf '$(C_YELLOW)⚠  未安裝 %s，正在自動安裝...$(C_RESET)\n' "$$pkg"; \
-			brew install "$$pkg" || exit 1; \
-			printf '$(C_GREEN)✔  已安裝 %s$(C_RESET)\n' "$$pkg"; \
+	@$(call header,檢查相依指令)
+	missing=0
+	@for cmd in $(REQUIRED_PACKAGES); do \
+		printf '$(C_CYAN)檢查:$(C_RESET) %s\n' "$$cmd"; \
+		if command -v "$$cmd" >/dev/null 2>&1; then \
+			printf '$(C_GREEN)✔  %s -> %s$(C_RESET)\n' "$$cmd" "$$(command -v "$$cmd")"; \
 		else \
-			printf '$(C_GREEN)✔  %s 已安裝$(C_RESET)\n' "$$pkg"; \
+			printf '$(C_RED)✘  找不到指令 %s$(C_RESET)\n' "$$cmd"; \
+			missing=1; \
 		fi; \
 	done
-	touch check_dep.stamp
+	@# 👇 底下要用gmake執行. 在make 3.81 還沒有 .ONESHELL 會導致missing不認得
+	@if [ "$$missing" -ne 0 ]; then \
+		printf '$(C_YELLOW)請自行安裝缺少的工具，例如:$(C_RESET)\n'; \
+		printf '  brew install kubectl kind container mdbook\n'; \
+		printf '$(C_DIM)此處不自動安裝。$(C_RESET)\n'; \
+		exit 1; \
+	fi
+	@touch check_dep.stamp
 
 check_dep: check_dep.stamp
 
