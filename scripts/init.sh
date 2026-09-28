@@ -3,7 +3,7 @@ brew install kubectl kind container
 # 啟動服務
 container system start
 
-# 創件
+# 創建
 container k8s create --name hello-cluster
 
 # 查詢
