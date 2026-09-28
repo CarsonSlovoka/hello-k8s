@@ -4,7 +4,7 @@ SHELL := /bin/bash
 .PHONY: all help version check_dep run start create stop \
 	mdbook.init mdbook.serve \
 	config config.context \
-	kubectl.cluster kubectl.get
+	kubectl.cluster kubectl.get kubectl.describe
 
 REQUIRED_PACKAGES = kubectl kind container \
 	mdbook
@@ -74,6 +74,7 @@ help:
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "config.context"    "從 ~/.kube/config 得到相關的context"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.cluster"   "cluster-info 確認打到這座叢集的 API Server"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.get"       "kubectl get <name>: Display one or many resources."
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.describe"  "Show details of a specific resource or group of resources."
 
 mdbook.init:
 	@$(call header,生成book.toml)
@@ -187,3 +188,14 @@ kubectl.get:
 	@# kindnet 或類似 CNI
 	@# 控制平面: kube-apiserver、kube-controller-manager、kube-scheduler、etcd
 	@# kube-proxy
+
+kubectl.describe:
+	@$(call header,kubectl describe)
+
+	@# Describe a node
+	@$(call run,   kubectl describe node $(CLUSTER_NAME))
+	# 以下為比較重要的內容
+	# Conditions: 中的 Ready. Status應要為True
+	# Addresses.InternalIP
+	# Taints：單節點練習叢集通常已拿掉 <none>，否則一般 Pod 無法排程
+	# Events: <none>  開機／CNI／kubelet 發生過什麼
