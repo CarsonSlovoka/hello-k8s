@@ -9,3 +9,6 @@ language = "zh"
 default-theme = "rust"
 preferred-dark-theme = "rust"
 mathjax-support = true
+
+# GitHub Pages 專案站預設路徑。CI 會用環境變數依實際 repo 名稱覆寫
+site-url = "/hello-k8s/"

@@ -9,6 +9,8 @@
 - 練習叢集名稱：`hello-cluster`
 - 前期建立叢集的方式：Apple `container k8s`，**不是**獨立的 `kind create cluster`
 
+線上閱讀：把倉庫推上 GitHub，並依 [在 GitHub Pages 閱讀](./github-pages.md) 開啟 Pages。
+
 ## 怎麼用
 
 1. 先在終端機自己打指令，對照預期結果。

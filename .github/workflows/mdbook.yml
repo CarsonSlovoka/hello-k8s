@@ -1,0 +1,56 @@
+# 把 docs/ 編成 mdBook，部署到 GitHub Pages。
+# 倉庫設定：Settings → Pages → Build and deployment → Source = GitHub Actions
+name: Deploy mdBook to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup mdBook
+        uses: peaceiris/actions-mdbook@v2
+        with:
+          mdbook-version: latest
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Build book
+        env:
+          # 專案站網址是 https://<owner>.github.io/<repo>/
+          # 若倉庫是 <user>.github.io，改成 "/"
+          MDBOOK_OUTPUT__HTML__SITE_URL: /${{ github.event.repository.name }}/
+        run: mdbook build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./book
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
