@@ -1,7 +1,8 @@
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 .ONESHELL:
-.PHONY: all help info check_dep run start create stop config
+.PHONY: all help info check_dep run start create stop config \
+	context
 
 REQUIRED_PACKAGES = kubectl kind container
 CLUSTER_NAME = hello-cluster
@@ -122,3 +123,19 @@ config:
 	@printf '$(C_DIM)'
 	cat ~/.kube/config
 	@printf '$(C_RESET)'
+
+
+# Tip: 其實這些context的內容，都可以在 ~/.kube/config 中看到
+context:
+	@$(call header,context)
+
+	@# 列出本機所有已知叢集。* 那一列是目前目標
+	@$(call run,kubectl config get-contexts)
+
+	@# use-context 可以切換成指定的cluster
+	@# 這會改你之後所有未加 --context 的 kubectl 指令
+	@$(call run,kubectl config use-context $(CLUSTER_NAME))
+
+	@# 僅顯示名稱
+	@$(call run,kubectl config current-context)
+
