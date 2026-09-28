@@ -4,6 +4,8 @@ SHELL := /bin/bash
 .PHONY: all help info check_dep run start create stop config
 
 REQUIRED_PACKAGES = kubectl kind container
+CLUSTER_NAME = hello-cluster
+
 
 # ---------------------------------------------------------------------------
 # 顏色：非 TTY 或設了 NO_COLOR 時自動關掉
@@ -62,7 +64,7 @@ help:
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "info"   "查看 container 版本"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "run"    "start + create 後列出叢集"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "start"  "啟動 container system"
-	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "create" "建立 hello-cluster"
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "create" "建立 $(CLUSTER_NAME)"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "stop"   "刪除叢集並停止 system"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "config" "顯示 ~/.kube/config"
 
@@ -95,8 +97,13 @@ start:
 	@$(call run,container system start)
 
 create:
-	@$(call header,建立叢集)
-	@$(call run,container k8s create --name hello-cluster)
+	@$(call header,建立叢集 cluster)
+	@# 作用： 拉 node image (預設常見為 kindest/node)、啟動一顆 Linux VM、在裡面做 kubeadm init、裝 CNI（常見是 kindnet）、把憑證寫進 ~/.kube/config
+	@$(call run,container k8s create -m 3G --name $(CLUSTER_NAME))
+	@# 會改動什麼：
+	@# 本機多一個名為 $(CLUSTER_NAME) 的叢集容器／VM
+	@# ~/.kube/config 多一個同名（或極相近）的 context
+	@# 你的 Mac 會佔用 CPU／記憶體（預設大約主機的 1/4，至少約 2 CPU / 2GB） 使用 -m 可以指定給多少記憶體
 
 run: start create
 	@$(call header,目前狀態)
@@ -106,7 +113,7 @@ run: start create
 # stop 之後 ~/.kube/config 的內容也會清除
 stop: check_dep.stamp
 	@$(call header,停止並清理)
-	@$(call run,container k8s rm --name hello-cluster)
+	@$(call run,container k8s rm --name $(CLUSTER_NAME))
 	@$(call run,container system stop)
 	@$(call ok,已停止)
 
