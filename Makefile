@@ -2,7 +2,8 @@ SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 .ONESHELL:
 .PHONY: all help version check_dep run start create stop \
-	config config.context
+	config config.context \
+	kubectl.cluster kubectl.get
 
 REQUIRED_PACKAGES = kubectl kind container
 CLUSTER_NAME = hello-cluster
@@ -69,6 +70,8 @@ help:
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "stop"   "刪除叢集並停止 system"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "config" "顯示 ~/.kube/config"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "config.context" "從 ~/.kube/config 得到相關的context"
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.cluster" "cluster-info 確認打到這座叢集的 API Server"
+	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.get"     "kubectl get <name>: Display one or many resources."
 
 check_dep.stamp:
 	@$(call header,檢查相依套件)
@@ -139,4 +142,16 @@ config.context:
 
 	@# 僅顯示名稱
 	@$(call run,kubectl config current-context)
+
+kubectl.cluster:
+	@$(call header,確認打到這座叢集的 API Server)
+	@$(call run,   kubectl cluster-info)
+
+kubectl.get:
+	@$(call header,kubectl get nodes 相關)
+	@$(call run,   kubectl get nodes)
+
+	@# -o wide有額外的資訊:{INTERNAL-IP, EXTERNAL-IP, OS-IMAGE, KERNEL-VERSION, CONTAINER-RUNTIME}
+	@$(call run,   kubectl get nodes -o wide)
+
 
