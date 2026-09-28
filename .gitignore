@@ -1,3 +1,6 @@
 *.stamp
 
 k8s.txt
+
+# mdbook
+book/

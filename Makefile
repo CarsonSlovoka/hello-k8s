@@ -2,10 +2,12 @@ SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 .ONESHELL:
 .PHONY: all help version check_dep run start create stop \
+	mdbook.init mdbook.serve \
 	config config.context \
 	kubectl.cluster kubectl.get
 
-REQUIRED_PACKAGES = kubectl kind container
+REQUIRED_PACKAGES = kubectl kind container \
+	mdbook
 CLUSTER_NAME = hello-cluster
 
 
@@ -72,6 +74,19 @@ help:
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "config.context"    "從 ~/.kube/config 得到相關的context"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.cluster"   "cluster-info 確認打到這座叢集的 API Server"
 	@printf '  $(C_GREEN)%-16s$(C_RESET) %s\n' "kubectl.get"       "kubectl get <name>: Display one or many resources."
+
+mdbook.init:
+	@$(call header,生成book.toml)
+	@$(call run,   mdbook init hello-k8s)
+	@$(call run,   mv -v  hello-k8s/* .)
+	@$(call run,   rm -rf hello-k8s)
+
+mdbook.build.stamp: book.toml $(fd . -e md docs)
+	@$(call run,   mdbook build)
+	touch mdbook.build.stamp
+
+mdbook.serve: book.toml mdbook.build.stamp
+	@$(call run,   mdbook serve)
 
 check_dep.stamp:
 	@$(call header,檢查相依套件)
